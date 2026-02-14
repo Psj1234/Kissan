@@ -1,0 +1,205 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 220 20% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 15%;
+
+    --primary: 142 72% 36%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 217 91% 53%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 210 30% 95%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 48 96% 53%;
+    --accent-foreground: 220 20% 15%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 142 72% 36%;
+
+    --radius: 1rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 142 72% 36%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 142 40% 95%;
+    --sidebar-accent-foreground: 142 72% 36%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 142 72% 36%;
+
+    /* Custom tokens */
+    --kisan-green: 142 72% 36%;
+    --kisan-blue: 217 91% 53%;
+    --kisan-yellow: 48 96% 53%;
+    --kisan-sky: 199 89% 48%;
+    --kisan-orange: 25 95% 53%;
+
+    --gradient-hero: linear-gradient(135deg, hsl(142 72% 36%), hsl(217 91% 53%), hsl(199 89% 48%));
+    --gradient-card: linear-gradient(135deg, hsl(142 72% 36% / 0.1), hsl(217 91% 53% / 0.1));
+    --gradient-accent: linear-gradient(135deg, hsl(48 96% 53%), hsl(25 95% 53%));
+
+    --glass-bg: hsl(0 0% 100% / 0.7);
+    --glass-border: hsl(0 0% 100% / 0.3);
+    --glass-shadow: 0 8px 32px hsl(217 91% 53% / 0.1);
+
+    --shadow-card: 0 4px 24px hsl(142 72% 36% / 0.08);
+    --shadow-elevated: 0 12px 40px hsl(217 91% 53% / 0.12);
+    --shadow-glow-green: 0 0 30px hsl(142 72% 36% / 0.3);
+    --shadow-glow-blue: 0 0 30px hsl(217 91% 53% / 0.3);
+  }
+
+  .dark {
+    --background: 222 47% 7%;
+    --foreground: 220 13% 91%;
+
+    --card: 222 47% 10%;
+    --card-foreground: 220 13% 91%;
+
+    --popover: 222 47% 10%;
+    --popover-foreground: 220 13% 91%;
+
+    --primary: 142 72% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 217 91% 53%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 48 96% 53%;
+    --accent-foreground: 220 20% 15%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 142 72% 45%;
+
+    --glass-bg: hsl(222 47% 10% / 0.7);
+    --glass-border: hsl(0 0% 100% / 0.1);
+    --glass-shadow: 0 8px 32px hsl(0 0% 0% / 0.3);
+    --shadow-card: 0 4px 24px hsl(0 0% 0% / 0.3);
+    --shadow-elevated: 0 12px 40px hsl(0 0% 0% / 0.4);
+    --shadow-glow-green: 0 0 40px hsl(142 72% 45% / 0.4);
+    --shadow-glow-blue: 0 0 40px hsl(217 91% 53% / 0.4);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  .gradient-card {
+    background: var(--gradient-card);
+  }
+
+  .gradient-accent {
+    background: var(--gradient-accent);
+  }
+
+  .glow-green {
+    box-shadow: var(--shadow-glow-green);
+  }
+
+  .glow-blue {
+    box-shadow: var(--shadow-glow-blue);
+  }
+
+  .card-shadow {
+    box-shadow: var(--shadow-card);
+  }
+
+  .card-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .voice-pulse {
+    animation: voicePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .float-gentle {
+    animation: floatGentle 6s ease-in-out infinite;
+  }
+
+  .tilt-3d {
+    transition: transform 0.3s ease;
+    transform-style: preserve-3d;
+  }
+
+  .tilt-3d:hover {
+    transform: perspective(1000px) rotateX(2deg) rotateY(4deg) scale(1.02);
+  }
+
+  .shimmer {
+    animation: shimmer 2s linear infinite;
+    background-size: 200% 100%;
+  }
+}
+
+@keyframes voicePulse {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(142 72% 36% / 0.4); }
+  50% { box-shadow: 0 0 0 20px hsl(142 72% 36% / 0); }
+}
+
+@keyframes floatGentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes price-tick {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}

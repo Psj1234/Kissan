@@ -1,0 +1,368 @@
+/* KISAN AI Assistant – Glassmorphism, green glow, animations */
+
+.kisan-chatbot-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 8px 32px rgba(34, 139, 34, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.4),
+    0 0 24px rgba(34, 197, 94, 0.25);
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  color: hsl(142, 72%, 26%);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: kisan-pulse 2.5s ease-in-out infinite;
+}
+
+.kisan-chatbot-fab:hover {
+  transform: scale(1.04);
+  box-shadow:
+    0 12px 40px rgba(34, 139, 34, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.5),
+    0 0 32px rgba(34, 197, 94, 0.35);
+}
+
+.kisan-chatbot-fab-icon {
+  font-size: 1.25rem;
+}
+
+@keyframes kisan-pulse {
+  0%, 100% { box-shadow: 0 8px 32px rgba(34, 139, 34, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.4), 0 0 24px rgba(34, 197, 94, 0.25); }
+  50%  { box-shadow: 0 8px 32px rgba(34, 139, 34, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.5), 0 0 36px rgba(34, 197, 94, 0.4); }
+}
+
+/* Chat window */
+.kisan-chatbot-window {
+  position: fixed;
+  bottom: 90px;
+  right: 24px;
+  z-index: 9999;
+  width: 350px;
+  height: 500px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.6),
+    0 0 40px rgba(34, 197, 94, 0.12);
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px) scale(0.96);
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+}
+
+.kisan-chatbot-window--open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.kisan-chatbot-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(34, 139, 34, 0.15);
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 20px 20px 0 0;
+}
+
+.kisan-chatbot-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: hsl(142, 72%, 26%);
+  font-size: 0.95rem;
+  flex: 1;
+}
+
+.kisan-chatbot-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: hsl(142, 72%, 36%);
+}
+
+.kisan-chatbot-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: hsl(142, 72%, 46%);
+  box-shadow: 0 0 8px hsl(142, 72%, 50%);
+  animation: kisan-blink 1.5s ease-in-out infinite;
+}
+
+@keyframes kisan-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.kisan-chatbot-close {
+  padding: 6px;
+  border: none;
+  background: transparent;
+  color: hsl(220, 10%, 40%);
+  cursor: pointer;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.kisan-chatbot-close:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: hsl(220, 10%, 20%);
+}
+
+.kisan-chatbot-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kisan-chatbot-msg {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 90%;
+}
+
+.kisan-chatbot-msg--user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.kisan-chatbot-msg--ai {
+  align-self: flex-start;
+}
+
+.kisan-chatbot-msg-icon {
+  flex-shrink: 0;
+  color: hsl(220, 10%, 50%);
+}
+
+.kisan-chatbot-msg--user .kisan-chatbot-msg-icon {
+  color: hsl(142, 72%, 36%);
+}
+
+.kisan-chatbot-msg-bubble {
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.kisan-chatbot-msg--user .kisan-chatbot-msg-bubble {
+  background: linear-gradient(135deg, hsl(142, 72%, 42%), hsl(142, 72%, 36%));
+  color: white;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 2px 12px rgba(34, 139, 34, 0.25);
+}
+
+.kisan-chatbot-msg--ai .kisan-chatbot-msg-bubble {
+  background: linear-gradient(135deg, hsl(217, 91%, 58%), hsl(217, 91%, 53%));
+  color: white;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.2);
+}
+
+/* Typing animation */
+.kisan-chatbot-typing {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, hsl(217, 91%, 58%), hsl(217, 91%, 53%));
+  color: white;
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+}
+
+.kisan-chatbot-typing span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.7;
+  animation: kisan-typing 1.2s ease-in-out infinite;
+}
+
+.kisan-chatbot-typing span:nth-child(2) { animation-delay: 0.15s; }
+.kisan-chatbot-typing span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes kisan-typing {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.7; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Loading dots */
+.kisan-chatbot-loading-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, hsl(217, 91%, 58%), hsl(217, 91%, 53%));
+  color: white;
+  border-radius: 16px;
+  border-bottom-left-radius: 4px;
+}
+
+.kisan-chatbot-loading-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: kisan-loading 1s ease-in-out infinite;
+}
+
+.kisan-chatbot-loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.kisan-chatbot-loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes kisan-loading {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+.kisan-chatbot-footer {
+  padding: 12px;
+  border-top: 1px solid rgba(34, 139, 34, 0.12);
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 0 0 20px 20px;
+}
+
+.kisan-chatbot-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  border: 1px solid rgba(34, 139, 34, 0.2);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.kisan-chatbot-voice {
+  padding: 8px;
+  border: none;
+  background: transparent;
+  color: hsl(220, 10%, 50%);
+  cursor: pointer;
+  border-radius: 10px;
+  display: flex;
+  transition: background 0.15s, color 0.15s;
+}
+
+.kisan-chatbot-voice:hover {
+  background: rgba(34, 139, 34, 0.1);
+  color: hsl(142, 72%, 36%);
+}
+
+.kisan-chatbot-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px 0;
+  font-size: 0.9rem;
+  outline: none;
+  font-family: inherit;
+}
+
+.kisan-chatbot-input::placeholder {
+  color: hsl(220, 10%, 60%);
+}
+
+.kisan-chatbot-send {
+  padding: 8px;
+  border: none;
+  background: hsl(142, 72%, 42%);
+  color: white;
+  cursor: pointer;
+  border-radius: 10px;
+  display: flex;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.kisan-chatbot-send:hover:not(:disabled) {
+  background: hsl(142, 72%, 36%);
+  transform: scale(1.05);
+}
+
+.kisan-chatbot-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+/* Voice recording states */
+.kisan-chatbot-voice--recording {
+  background: rgba(239, 68, 68, 0.15);
+  color: hsl(0, 84%, 60%);
+  animation: kisan-voice-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes kisan-voice-pulse {
+  0%, 100% { 
+    background: rgba(239, 68, 68, 0.15);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% { 
+    background: rgba(239, 68, 68, 0.25);
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+  }
+}
+
+.kisan-chatbot-listening-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 12px;
+  color: hsl(0, 84%, 50%);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.kisan-chatbot-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: hsl(0, 84%, 60%);
+  animation: kisan-pulse-dot 1.5s ease-in-out infinite;
+}
+
+@keyframes kisan-pulse-dot {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.5;
+    transform: scale(1.3);
+  }
+}
