@@ -7,9 +7,10 @@ import { useState, useRef, useEffect } from "react";
 import { X, Send, Mic, Bot, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import "./KisanChatbot.css";
+import { apiUrl } from "../lib/api";
 
-const CHATBOT_API = "/chatbot/predict";
-const RECOMMEND_API = "/chatbot/recommend";
+const CHATBOT_API = apiUrl("/chatbot/predict");
+const RECOMMEND_API = apiUrl("/chatbot/recommend");
 const COMMODITIES = ["onion", "potato", "tomato", "cucumber", "wheat", "bajra", "rice", "soybean"];
 
 // Detect if user message is asking for price prediction
@@ -216,7 +217,7 @@ export default function KisanChatbot() {
       setPendingAction('predict');
       setTyping(true);
       try {
-        const lastRes = await fetch(`/chatbot/prices/last/${comm}`);
+        const lastRes = await fetch(apiUrl(`/chatbot/prices/last/${comm}`));
         const lastData = await lastRes.json().catch(() => ({}));
         const stored = lastData.prices || [];
         if (stored.length >= 4) {
@@ -357,7 +358,7 @@ export default function KisanChatbot() {
       setPendingAction('predict');
       setTyping(true);
       try {
-        const lastRes = await fetch(`/chatbot/prices/last/${comm}`);
+        const lastRes = await fetch(apiUrl(`/chatbot/prices/last/${comm}`));
         const lastData = await lastRes.json().catch(() => ({}));
         const stored = lastData.prices || [];
         if (stored.length >= 4) {

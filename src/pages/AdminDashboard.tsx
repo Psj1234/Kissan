@@ -27,6 +27,7 @@ import {
   addCrop,
   type PriceRow,
 } from "@/lib/adminStore";
+import { apiUrl } from "@/lib/api";
 
 const AdminDashboard = () => {
   const [activity, setActivity] = useState(getActivityStats());
@@ -50,7 +51,7 @@ const AdminDashboard = () => {
     setPrices(loaded);
     loaded.forEach((row) => {
       if ((row.lastThreePrices?.length ?? 0) > 0) {
-        fetch("/chatbot/prices", {
+        fetch(apiUrl("/chatbot/prices"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ crop: row.crop, lastThreePrices: row.lastThreePrices }),
@@ -79,7 +80,7 @@ const AdminDashboard = () => {
     savePriceUpdate(row.crop, oldOfficial, newPrice);
     setSavedId(id);
     setCropsCount(updated.length);
-    fetch("/chatbot/prices", {
+    fetch(apiUrl("/chatbot/prices"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ crop: row.crop, lastThreePrices: lastFour }),

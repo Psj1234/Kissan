@@ -10,6 +10,7 @@ import {
   type PriceRow,
   type PriceHistoryEntry,
 } from "@/lib/adminStore";
+import { apiUrl } from "@/lib/api";
 
 const AdminPriceControl = () => {
   const [prices, setPrices] = useState<PriceRow[]>(() => getMarketPrices());
@@ -42,7 +43,7 @@ const AdminPriceControl = () => {
     savePriceUpdate(row.crop, oldOfficial, newPrice);
     setSaved(id);
     setHistory(getPriceHistory());
-    fetch("/chatbot/prices", {
+    fetch(apiUrl("/chatbot/prices"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ crop: row.crop, lastThreePrices: lastFour }),

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Mic, Wheat, Eye, EyeOff, Phone, Loader } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { apiUrl } from "@/lib/api";
 
 const LoginPage = () => {
   const [role, setRole] = useState<"farmer" | "official">("farmer");
@@ -42,7 +43,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("/chatbot/auth/send-otp", {
+      const res = await fetch(apiUrl("/chatbot/auth/send-otp"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phoneNumber }),
@@ -74,7 +75,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("/chatbot/auth/verify-otp", {
+      const res = await fetch(apiUrl("/chatbot/auth/verify-otp"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phoneNumber, otp }),
@@ -113,7 +114,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("/chatbot/auth/resend-otp", {
+      const res = await fetch(apiUrl("/chatbot/auth/resend-otp"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phoneNumber }),
