@@ -1,14 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Mic, Wheat, Eye, EyeOff } from "lucide-react";
+import { Mic, Wheat, Eye, EyeOff, Phone, Loader } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [role, setRole] = useState<"farmer" | "official">("farmer");
+  const [loginMode, setLoginMode] = useState<"username" | "phone">("username");
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [otpCounter, setOtpCounter] = useState(0);
   const navigate = useNavigate();
+
+  // OTP Countdown Timer
+  useEffect(() => {
+    if (otpCounter <= 0) return;
+    const timer = setTimeout(() => setOtpCounter(otpCounter - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [otpCounter]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,6 +31,108 @@ const LoginPage = () => {
       navigate("/dashboard");
     } else {
       navigate("/admin");
+    }
+  };
+
+  // Handle sending OTP
+  const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccessMessage("");
+    setLoading(true);
+
+    try {
+      const res = await fetch("/chatbot/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phoneNumber }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to send OTP");
+        return;
+      }
+
+      setOtpSent(true);
+      setSuccessMessage("OTP sent successfully! Check your phone.");
+      setOtpCounter(60); // 60 second countdown
+    } catch (err) {
+      setError("Error sending OTP. Please try again.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle OTP verification
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccessMessage("");
+    setLoading(true);
+
+    try {
+      const res = await fetch("/chatbot/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phoneNumber, otp }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to verify OTP");
+        return;
+      }
+
+      if (data.verified) {
+        setSuccessMessage("Phone verified! Logging in...");
+        setTimeout(() => {
+          if (role === "farmer") {
+            navigate("/dashboard");
+          } else {
+            navigate("/admin");
+          }
+        }, 1500);
+      } else {
+        setError("Invalid OTP. Please try again.");
+      }
+    } catch (err) {
+      setError("Error verifying OTP. Please try again.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle resend OTP
+  const handleResendOtp = async () => {
+    setError("");
+    setLoading(true);
+
+    try {
+      const res = await fetch("/chatbot/auth/resend-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phoneNumber }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to resend OTP");
+        return;
+      }
+
+      setSuccessMessage("New OTP sent! Check your phone.");
+      setOtpCounter(60);
+    } catch (err) {
+      setError("Error resending OTP. Please try again.");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -85,46 +202,173 @@ const LoginPage = () => {
               ))}
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">Username</label>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all outline-none"
-                  placeholder="Enter your username"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-1.5">Password</label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all outline-none pr-12"
-                    placeholder="Enter your password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-              </div>
+            {/* Login Mode Toggle */}
+            <div className="flex rounded-lg bg-muted p-1 mb-6 border border-border">
+              {(["username", "phone"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => {
+                    setLoginMode(mode);
+                    setError("");
+                    setSuccessMessage("");
+                  }}
+                  className={`flex-1 py-2 px-3 rounded-md text-xs font-heading font-semibold transition-all duration-300 ${
+                    loginMode === mode
+                      ? "bg-primary text-primary-foreground shadow-md"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {mode === "username" ? "👤 Username" : "📱 Phone"}
+                </button>
+              ))}
+            </div>
 
-              <motion.button
-                type="submit"
-                className="w-full py-3 rounded-xl gradient-hero text-primary-foreground font-heading font-semibold text-base shadow-lg hover:shadow-xl transition-shadow"
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
+            {/* Error Message */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm"
               >
-                {role === "farmer" ? "Login as Farmer 🌾" : "Login as Official 🏢"}
-              </motion.button>
-            </form>
+                {error}
+              </motion.div>
+            )}
+
+            {/* Success Message */}
+            {successMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 p-3 rounded-lg bg-green-500/10 border border-green-500/30 text-green-600 text-sm"
+              >
+                {successMessage}
+              </motion.div>
+            )}
+
+            {/* Username Login Form */}
+            {loginMode === "username" && (
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">Username</label>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all outline-none"
+                    placeholder="Enter your username"
+                    disabled={loading}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1.5">Password</label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all outline-none pr-12"
+                      placeholder="Enter your password"
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                </div>
+
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 rounded-xl gradient-hero text-primary-foreground font-heading font-semibold text-base shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  whileHover={{ scale: loading ? 1 : 1.01 }}
+                  whileTap={{ scale: loading ? 1 : 0.99 }}
+                >
+                  {loading && <Loader className="w-4 h-4 animate-spin" />}
+                  {role === "farmer" ? "Login as Farmer 🌾" : "Login as Official 🏢"}
+                </motion.button>
+              </form>
+            )}
+
+            {/* Phone Login Form */}
+            {loginMode === "phone" && (
+              <form onSubmit={!otpSent ? handleSendOtp : handleVerifyOtp} className="space-y-4">
+                {!otpSent ? (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-1.5">Phone Number</label>
+                      <div className="flex items-center gap-2">
+                        <span className="px-3 py-3 rounded-xl border border-border bg-muted text-muted-foreground text-sm font-medium">
+                          +91
+                        </span>
+                        <input
+                          type="tel"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ""))}
+                          className="flex-1 px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all outline-none"
+                          placeholder="9876543210"
+                          maxLength="10"
+                          disabled={loading}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1.5">Enter your 10-digit mobile number</p>
+                    </div>
+
+                    <motion.button
+                      type="submit"
+                      disabled={loading || phoneNumber.length !== 10}
+                      className="w-full py-3 rounded-xl gradient-hero text-primary-foreground font-heading font-semibold text-base shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      whileHover={{ scale: loading || phoneNumber.length !== 10 ? 1 : 1.01 }}
+                      whileTap={{ scale: loading || phoneNumber.length !== 10 ? 1 : 0.99 }}
+                    >
+                      {loading && <Loader className="w-4 h-4 animate-spin" />}
+                      Send OTP
+                    </motion.button>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-1.5">Enter OTP</label>
+                      <input
+                        type="text"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+                        className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all outline-none text-center text-2xl tracking-widest font-mono"
+                        placeholder="000000"
+                        maxLength="6"
+                        disabled={loading}
+                      />
+                      <p className="text-xs text-muted-foreground mt-1.5">We sent a 6-digit OTP to +91{phoneNumber}</p>
+                    </div>
+
+                    <motion.button
+                      type="submit"
+                      disabled={loading || otp.length !== 6}
+                      className="w-full py-3 rounded-xl gradient-hero text-primary-foreground font-heading font-semibold text-base shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      whileHover={{ scale: loading || otp.length !== 6 ? 1 : 1.01 }}
+                      whileTap={{ scale: loading || otp.length !== 6 ? 1 : 0.99 }}
+                    >
+                      {loading && <Loader className="w-4 h-4 animate-spin" />}
+                      Verify OTP
+                    </motion.button>
+
+                    <motion.button
+                      type="button"
+                      onClick={handleResendOtp}
+                      disabled={loading || otpCounter > 0}
+                      className="w-full py-2.5 rounded-xl border border-border text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      whileHover={{ scale: loading || otpCounter > 0 ? 1 : 1.01 }}
+                      whileTap={{ scale: loading || otpCounter > 0 ? 1 : 0.99 }}
+                    >
+                      {otpCounter > 0 ? `Resend in ${otpCounter}s` : "Resend OTP"}
+                    </motion.button>
+                  </>
+                )}
+              </form>
+            )}
 
             <div className="mt-6 flex items-center gap-3">
               <div className="flex-1 h-px bg-border" />
